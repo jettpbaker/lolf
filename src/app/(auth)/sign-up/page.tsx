@@ -4,14 +4,12 @@ import { authClient } from '@/utils/auth-client';
 import { useState } from 'react';
 
 export default function SignUp() {
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(username, email, name, password);
 
     const data = await authClient.signUp.email({
       email: email,
@@ -25,18 +23,6 @@ export default function SignUp() {
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <label htmlFor='username'>Username:</label>
-        <br />
-        <input
-          id='username'
-          type='text'
-          name='username'
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          style={{ border: '1px solid #fff' }}
-        />
-      </div>
-      <div>
         <label htmlFor='email'>Email:</label>
         <br />
         <input
@@ -49,7 +35,7 @@ export default function SignUp() {
         />
       </div>
       <div>
-        <label htmlFor='name'>Name:</label>
+        <label htmlFor='name'>Username:</label>
         <br />
         <input
           id='name'

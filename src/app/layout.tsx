@@ -1,22 +1,14 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { Jersey_10 } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
+import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
-});
-
-const jersey = Jersey_10({
-  variable: '--font-jersey',
-  subsets: ['latin'],
-  weight: ['400'],
+const pixel = localFont({
+  src: '../fonts/pixel-font.woff2',
+  variable: '--font-pixel',
+  display: 'swap',
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -30,8 +22,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
-      <body className={`${jersey.className} antialiased`}>{children}</body>
+    <html
+      lang='en'
+      suppressHydrationWarning
+      className='max-h-screen max-w-screen'
+    >
+      <body className={`${pixel.className} antialiased`}>
+        <ThemeProvider
+          attribute='class'
+          defaultTheme='system'
+          enableSystem
+          disableTransitionOnChange
+        >
+          {/* <div>
+            <ThemeSwitcher />
+          </div> */}
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
