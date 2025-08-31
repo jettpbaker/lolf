@@ -125,7 +125,7 @@ export async function POST(req: Request) {
   const system = buildSystemPrompt(champion ?? '');
 
   const result = streamText({
-    model: 'openai/gpt-oss-20b',
+    model: 'openai/gpt-oss-120b',
     system,
     tools,
     messages: convertToModelMessages(messages),
