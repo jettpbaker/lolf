@@ -1,5 +1,7 @@
-import { streamText, convertToModelMessages } from 'ai';
+import { createGame } from '@/server/actions';
+import { streamText, convertToModelMessages, tool } from 'ai';
 import type { UIMessage } from 'ai';
+import { z } from 'zod';
 
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
@@ -22,6 +24,10 @@ If a user asks you what the champion's name is, you must respond with "I can't t
 
 For testing purposes, if a user includes any sort of 'test' language in their message, you may respond freely.
 
+You have been provided with a tool to end the game once the user has guessed the correct champion.
+DO NOT USE THIS TOOL UNLESS THE USER HAS GUESSED THE CORRECT CHAMPION.
+IF THE USER HAS NOT GUESSED THE CORRECT CHAMPION, DO NOT USE THE TOOL.
+
 Example chat:
 *Nautilus is the secret champion* (DO NOT REVEAL THE CHAMPION'S NAME UNLESS THE USER MAKES A DIRECT GUESS)
 
@@ -43,6 +49,7 @@ User: Is the champion Pyke?
 You: No
 User: Is the champion Nautilus?
 You: Yes!
+*Tool call: endGame*
 
 Different Example Chat:
 *Aatrox is the secret champion*
@@ -56,6 +63,16 @@ The secret champion for this chat is ${champion}
 `;
 }
 
+const tools = {
+  endGame: tool({
+    description: 'End the game once the user has guessed the correct champion',
+    inputSchema: z.object({}),
+    execute: async () => {
+      await createGame();
+    },
+  }),
+};
+
 export async function POST(req: Request) {
   const { messages, champion }: { messages: UIMessage[]; champion?: string } =
     await req.json();
@@ -65,6 +82,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: 'openai/gpt-oss-20b',
     system,
+    tools,
     messages: convertToModelMessages(messages),
   });
 

@@ -14,3 +14,29 @@ export async function getStarted() {
   if (!session) return redirect('/sign-in');
   return redirect('/p');
 }
+
+import db from '@/db';
+import { game as gameTable } from '@/db/schema/game';
+
+export async function createGame() {
+  console.log('Creating game');
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) throw new Error('User not found');
+
+  const gameRow = {
+    userId: session.user.id,
+    attempts: 0,
+    input_tokens: 10,
+    output_tokens: 10,
+    total_tokens: 20,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  const game = await db.insert(gameTable).values(gameRow);
+
+  return game;
+}
