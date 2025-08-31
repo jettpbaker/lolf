@@ -98,6 +98,10 @@ You:
 
 The user has not guessed the correct champion, so you should not use the tool to end the game.
 
+NEVER END THE GAME UNLESS THE USER HAS GUESSED THE CORRECT CHAMPION.
+IF THE USER GUESSES THE RIGHT ROLE, LANE, OR SPECIES, DO NOT END THE GAME.
+ONLY END THE GAME IF THE USER HAS GUESSED THE CORRECT CHAMPION.
+
 ---
 
 The secret champion for this chat is ${champion}
