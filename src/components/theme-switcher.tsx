@@ -2,19 +2,27 @@
 
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { MoonIcon, SunDimIcon } from 'raster-react';
 
 export function ThemeSwitcher({ className }: { className?: string }) {
   const { setTheme, theme } = useTheme();
 
   return (
-    <button
+    <Button
       type='button'
       onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className={cn('h-10 w-10 grid place-items-center', className)}
+      variant='ghost'
+      size='icon'
+      className={cn('h-10 w-10', className)}
       aria-label='Toggle theme'
       suppressHydrationWarning
     >
-      {theme === 'dark' ? '🌞' : '🌙'}
-    </button>
+      {theme === 'dark' ? (
+        <SunDimIcon size={24} color='' strokeWidth={5} radius={1} />
+      ) : (
+        <MoonIcon size={24} color='' strokeWidth={5} radius={1} />
+      )}
+    </Button>
   );
 }

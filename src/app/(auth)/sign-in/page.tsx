@@ -2,10 +2,12 @@
 
 import { authClient } from '@/utils/auth-client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SignIn() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,6 +18,11 @@ export default function SignIn() {
     });
 
     console.log(data);
+
+    // Redirect to /p/ if sign-in was successful
+    if (data?.data?.user) {
+      router.push('/p/');
+    }
   };
 
   return (

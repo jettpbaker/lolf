@@ -2,11 +2,13 @@
 
 import { authClient } from '@/utils/auth-client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -18,6 +20,11 @@ export default function SignUp() {
     });
 
     console.log(data);
+
+    // Redirect to /p/ if sign-up was successful
+    if (data?.data?.user) {
+      router.push('/p/');
+    }
   };
 
   return (

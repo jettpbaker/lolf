@@ -12,7 +12,7 @@ function NavItem({ href, label }: { href: string; label: string }) {
       href={href}
       aria-current={isActive ? 'page' : undefined}
       className={
-        `px-4 h-10 grid place-items-center text-sm md:text-base transition-colors ` +
+        `px-4 h-10 grid place-items-center text-sm md:text-base transition-colors rainbow-border-hover rounded-sm border bg-card text-card-foreground overflow-hidden` +
         (isActive ? 'bg-accent text-accent-foreground' : 'hover:bg-muted')
       }
     >
@@ -25,7 +25,7 @@ export default function GameHeader() {
   return (
     <header className='w-fit mx-auto mt-4'>
       <nav
-        className='rainbow-border-hover rounded-sm border bg-card text-card-foreground shadow-sm overflow-hidden'
+        className='rounded-sm border bg-card text-card-foreground shadow-sm '
         aria-label='Main'
       >
         <div className='flex items-stretch divide-x'>
