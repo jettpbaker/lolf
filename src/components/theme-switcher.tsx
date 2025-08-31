@@ -19,9 +19,21 @@ export function ThemeSwitcher({ className }: { className?: string }) {
       suppressHydrationWarning
     >
       {theme === 'dark' ? (
-        <SunDimIcon size={24} color='' strokeWidth={5} radius={1} />
+        <SunDimIcon
+          size={24}
+          color=''
+          strokeWidth={5}
+          radius={1}
+          suppressHydrationWarning
+        />
       ) : (
-        <MoonIcon size={24} color='' strokeWidth={5} radius={1} />
+        <MoonIcon
+          size={24}
+          color=''
+          strokeWidth={5}
+          radius={1}
+          suppressHydrationWarning
+        />
       )}
     </Button>
   );
