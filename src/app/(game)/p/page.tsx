@@ -1,4 +1,5 @@
 import selectRandomChampionId from '@/utils/select-random-champion';
+import ChatWindow from './chat-window';
 
 export default async function Play() {
   const id = await selectRandomChampionId();
@@ -8,6 +9,7 @@ export default async function Play() {
     <div>
       Play
       <p>Selected Champion: {id}</p>
+      <ChatWindow championId={id} />
     </div>
   );
 }
