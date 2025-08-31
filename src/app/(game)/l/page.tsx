@@ -17,7 +17,7 @@ function makeMockGames(count: number): GameType[] {
     const total = input + output;
     const now = new Date();
     items.push({
-      id: `game_${i + 1}`,
+      id: i + 1,
       userId: `user_${i + 1}`,
       attempts,
       input_tokens: input,
