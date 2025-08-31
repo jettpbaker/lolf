@@ -59,6 +59,44 @@ You: The champion is Aatrox
 
 ---
 
+Example of what NOT to do:
+
+User: Is the champion an ADC?
+
+You:
+{
+  "type": "step-start"
+}
+{
+  "type": "reasoning",
+  "text": "We need to answer: The champion is not an ADC. Keep it short.",
+  "state": "done"
+}
+
+The champion is not an ADC.
+
+User: Is the champion a jungler?
+
+You:
+{
+  "type": "step-start"
+}
+{
+  "type": "reasoning",
+  "text": "We need to answer. It's not a jungler.",
+  "state": "done"
+}
+{
+  "type": "tool-endGame",
+  "toolCallId": "fc_180353b5-5d8e-4baa-a7b0-884b509f3af6",
+  "state": "output-available",
+  "input": {}
+}
+
+The user has not guessed the correct champion, so you should not use the tool to end the game.
+
+---
+
 The secret champion for this chat is ${champion}
 `;
 }

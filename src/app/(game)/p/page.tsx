@@ -7,8 +7,6 @@ export default async function Play() {
 
   return (
     <div>
-      Play
-      <p>Selected Champion: {id}</p>
       <ChatWindow championId={id} />
     </div>
   );
