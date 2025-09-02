@@ -18,13 +18,16 @@ export async function getStarted() {
 import db from '@/db';
 import { game as gameTable } from '@/db/schema/game';
 
-export async function createGame() {
-  console.log('Creating game');
+export async function createGame(guess: string, champion: string) {
   const session = await auth.api.getSession({
     headers: await headers(),
   });
 
   if (!session) throw new Error('User not found');
+
+  if (guess !== champion) {
+    throw new Error('Guess does not match champion');
+  }
 
   const gameRow = {
     userId: session.user.id,
