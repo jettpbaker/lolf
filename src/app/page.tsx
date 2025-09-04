@@ -1,5 +1,6 @@
-import { getStarted } from '@/server/actions';
-import { Button } from '@/components/ui/button';
+import { getStarted } from '@/server/actions'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 
 export default function Home() {
   return (
@@ -17,18 +18,13 @@ export default function Home() {
             Get Started
           </Button>
         </form>
-        <div className='flex flex-col gap-3'>
-          <h2 className='text-lg font-semibold'>Button variants</h2>
-          <div className='flex flex-wrap items-center gap-3'>
-            <Button>Default</Button>
-            <Button variant='secondary'>Secondary</Button>
-            <Button variant='destructive'>Destructive</Button>
-            <Button variant='outline'>Outline</Button>
-            <Button variant='ghost'>Ghost</Button>
-            <Button variant='link'>Link</Button>
-          </div>
-        </div>
+        <p>
+          Or check out the{' '}
+          <Link href='/l' className='underline'>
+            leaderboard
+          </Link>
+        </p>
       </div>
     </main>
-  );
+  )
 }

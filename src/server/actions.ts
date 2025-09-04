@@ -17,7 +17,8 @@ export async function getStarted() {
 
 import db from '@/db'
 import { game as gameTable } from '@/db/schema/game'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, asc } from 'drizzle-orm'
+import { user as userTable } from '@/db/schema/auth-schema'
 
 export async function createGame(userId: string) {
   const gameRow = {
@@ -54,4 +55,20 @@ export async function endGame({
       completed: true,
     })
     .where(and(eq(gameTable.userId, session.user.id), eq(gameTable.id, gameId)))
+}
+
+export async function getGames() {
+  const games = await db
+    .select({
+      id: gameTable.id,
+      userName: userTable.name,
+      input_tokens: gameTable.input_tokens,
+      output_tokens: gameTable.output_tokens,
+      total_tokens: gameTable.total_tokens,
+    })
+    .from(gameTable)
+    .leftJoin(userTable, eq(gameTable.userId, userTable.id))
+    .where(eq(gameTable.completed, true))
+    .orderBy(asc(gameTable.total_tokens))
+  return games
 }
