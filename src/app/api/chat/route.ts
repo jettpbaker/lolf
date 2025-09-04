@@ -1,4 +1,4 @@
-import { createGame } from '@/server/actions'
+import { endGame } from '@/server/actions'
 import { streamText, convertToModelMessages, tool } from 'ai'
 import type { UIMessage } from 'ai'
 import { z } from 'zod'
@@ -87,7 +87,9 @@ const buildTools = () => {
         'ONLY EVER END THE GAME AFTER THE USER HAS GUESSED THE CORRECT CHAMPION, NEVER END THE GAME FOR ANY OTHER REASON.',
       inputSchema: z.object({ guess: z.string() }),
       execute: async () => {
-        await createGame()
+        await endGame({
+          tokens: { input_tokens: 0, output_tokens: 0, total_tokens: 0 },
+        })
       },
     }),
   }

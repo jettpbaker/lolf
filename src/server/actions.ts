@@ -19,15 +19,9 @@ import db from '@/db'
 import { game as gameTable } from '@/db/schema/game'
 import { eq } from 'drizzle-orm'
 
-export async function createGame() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-
-  if (!session) throw new Error('User not found')
-
+export async function createGame(userId: string) {
   const gameRow = {
-    userId: session.user.id,
+    userId,
     attempts: 0,
     input_tokens: 10,
     output_tokens: 10,
@@ -36,7 +30,8 @@ export async function createGame() {
     updatedAt: new Date(),
   }
 
-  await db.insert(gameTable).values(gameRow)
+  const game = await db.insert(gameTable).values(gameRow)
+  return game
 }
 
 export async function endGame({
