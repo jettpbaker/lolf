@@ -22,10 +22,6 @@ import { eq } from 'drizzle-orm'
 export async function createGame(userId: string) {
   const gameRow = {
     userId,
-    attempts: 0,
-    input_tokens: 10,
-    output_tokens: 10,
-    total_tokens: 20,
     createdAt: new Date(),
     updatedAt: new Date(),
   }
