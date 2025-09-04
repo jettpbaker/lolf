@@ -5,34 +5,33 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import type { GameType } from '@/db/schema/game';
+} from '@/components/ui/table'
+import type { GameType } from '@/db/schema/game'
 
 function makeMockGames(count: number): GameType[] {
-  const items: GameType[] = [];
+  const items: GameType[] = []
   for (let i = 0; i < count; i++) {
-    const attempts = 10;
-    const input = 200 + Math.floor(Math.random() * 250);
-    const output = 200 + Math.floor(Math.random() * 900);
-    const total = input + output;
-    const now = new Date();
+    const input = 200 + Math.floor(Math.random() * 250)
+    const output = 200 + Math.floor(Math.random() * 900)
+    const total = input + output
+    const now = new Date()
     items.push({
       id: i + 1,
       userId: `user_${i + 1}`,
-      attempts,
       input_tokens: input,
       output_tokens: output,
       total_tokens: total,
+      completed: true,
       createdAt: now,
       updatedAt: now,
-    });
+    })
   }
-  items.sort((a, b) => a.total_tokens - b.total_tokens);
-  return items;
+  items.sort((a, b) => (a.total_tokens ?? 0) - (b.total_tokens ?? 0))
+  return items
 }
 
 export default async function LeaderboardPage() {
-  const games = makeMockGames(25);
+  const games = makeMockGames(25)
 
   return (
     <section className='space-y-4'>
@@ -45,7 +44,6 @@ export default async function LeaderboardPage() {
           <TableRow>
             <TableHead className='w-16'>Rank</TableHead>
             <TableHead>User</TableHead>
-            <TableHead className='text-right'>Challenges</TableHead>
             <TableHead className='text-right'>Input Tokens</TableHead>
             <TableHead className='text-right'>Output Tokens</TableHead>
             <TableHead className='text-right'>Total tokens</TableHead>
@@ -53,16 +51,13 @@ export default async function LeaderboardPage() {
         </TableHeader>
         <TableBody>
           {games.map((g, idx) => {
-            const rank = idx + 1;
+            const rank = idx + 1
             return (
               <TableRow key={g.id}>
                 <TableCell className='font-medium tabular-nums'>
                   {rank}
                 </TableCell>
                 <TableCell className='font-medium'>{g.userId}</TableCell>
-                <TableCell className='text-right tabular-nums'>
-                  {g.attempts}
-                </TableCell>
                 <TableCell className='text-right tabular-nums'>
                   {g.input_tokens}
                 </TableCell>
@@ -73,10 +68,10 @@ export default async function LeaderboardPage() {
                   {g.total_tokens}
                 </TableCell>
               </TableRow>
-            );
+            )
           })}
         </TableBody>
       </Table>
     </section>
-  );
+  )
 }
