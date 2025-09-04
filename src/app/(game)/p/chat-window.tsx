@@ -7,11 +7,19 @@ import { Button } from '@/components/ui/button';
 import { CheckIcon } from 'raster-react';
 import Link from 'next/link';
 
-export default function Chat({ championId }: { championId: string }) {
+export default function Chat({
+  championId,
+  championInfo,
+}: {
+  championId: string;
+  championInfo: object;
+}) {
   const [input, setInput] = useState('');
 
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ body: { champion: championId } }),
+    transport: new DefaultChatTransport({
+      body: { champion: championId, championInfo },
+    }),
     async onToolCall({ toolCall }) {
       if (toolCall.dynamic) return;
 

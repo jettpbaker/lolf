@@ -7,7 +7,7 @@ import { z } from 'zod';
 // Allow streaming responses up to 30 seconds
 export const maxDuration = 30;
 
-function buildSystemPrompt(champion: string) {
+function buildSystemPrompt(champion: string, championInfo: object) {
   return {
     prompt: `
 Role
@@ -54,7 +54,11 @@ If the secret champion is 'Yasuo' and the user guesses 'Yasuoo', you may still c
 Secret Champion
 
 The secret champion for this session is ${champion}.
+
+Champion Information:
+${JSON.stringify(championInfo)}
 `,
+    // TODO: Dynamically calculate tokens
     tokens: 635,
   };
 }
@@ -75,13 +79,17 @@ const buildTools = (champion: string) => {
 };
 
 export async function POST(req: Request) {
-  const { messages, champion }: { messages: UIMessage[]; champion?: string } =
+  const {
+    messages,
+    champion,
+    championInfo,
+  }: { messages: UIMessage[]; champion?: string; championInfo?: object } =
     await req.json();
 
-  const system = buildSystemPrompt(champion ?? '');
+  const system = buildSystemPrompt(champion ?? '', championInfo ?? {});
 
   const result = streamText({
-    model: 'openai/gpt-oss-120b',
+    model: 'deepseek/deepseek-v3.1',
     system: system.prompt,
     tools: buildTools(champion ?? ''),
     onFinish: ({ usage }) => {
