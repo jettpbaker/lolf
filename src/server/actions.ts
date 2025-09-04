@@ -17,7 +17,7 @@ export async function getStarted() {
 
 import db from '@/db'
 import { game as gameTable } from '@/db/schema/game'
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 
 export async function createGame(userId: string) {
   const gameRow = {
@@ -26,20 +26,24 @@ export async function createGame(userId: string) {
     updatedAt: new Date(),
   }
 
-  const game = await db.insert(gameTable).values(gameRow)
+  const game = await db.insert(gameTable).values(gameRow).returning()
   return game
 }
 
 export async function endGame({
   tokens,
+  gameId,
 }: {
   tokens: { input_tokens: number; output_tokens: number; total_tokens: number }
+  gameId: number
 }) {
   const session = await auth.api.getSession({
     headers: await headers(),
   })
 
   if (!session) throw new Error('User not found')
+
+  console.log('trying to end game')
 
   await db
     .update(gameTable)
@@ -49,5 +53,5 @@ export async function endGame({
       total_tokens: tokens.total_tokens,
       completed: true,
     })
-    .where(eq(gameTable.userId, session.user.id))
+    .where(and(eq(gameTable.userId, session.user.id), eq(gameTable.id, gameId)))
 }

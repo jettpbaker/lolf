@@ -17,13 +17,13 @@ export default async function Play() {
   const championPromise = getChampion(id)
   const gamePromise = createGame(session.user.id)
 
-  const [champion, game] = await Promise.all([championPromise, gamePromise])
+  const [champion, [game]] = await Promise.all([championPromise, gamePromise])
   if (!champion) return <div>No champion found</div>
   if (!game) return <div>Failed to create game :C</div>
 
   return (
     <div>
-      <ChatWindow championId={id} championInfo={champion} />
+      <ChatWindow championId={id} championInfo={champion} gameId={game.id} />
     </div>
   )
 }

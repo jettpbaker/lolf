@@ -80,40 +80,43 @@ ${JSON.stringify(championInfo)}
   }
 }
 
-const buildTools = () => {
-  return {
-    endGame: tool({
-      description:
-        'ONLY EVER END THE GAME AFTER THE USER HAS GUESSED THE CORRECT CHAMPION, NEVER END THE GAME FOR ANY OTHER REASON.',
-      inputSchema: z.object({ guess: z.string() }),
-      execute: async () => {
-        await endGame({
-          tokens: { input_tokens: 0, output_tokens: 0, total_tokens: 0 },
-        })
-      },
-    }),
-  }
-}
-
 export async function POST(req: Request) {
   const {
     messages,
     champion,
     championInfo,
-  }: { messages: UIMessage[]; champion?: string; championInfo?: object } =
-    await req.json()
+    gameId,
+  }: {
+    messages: UIMessage[]
+    champion?: string
+    championInfo?: object
+    gameId: number
+  } = await req.json()
 
   const system = await buildSystemPrompt(champion ?? '', championInfo ?? {})
+
+  let endGameWasRequested = false
 
   const result = streamText({
     model: 'openai/gpt-5-mini',
     system: system.prompt,
-    tools: buildTools(),
-    onFinish: ({ usage }) => {
+    tools: {
+      endGame: tool({
+        description:
+          'ONLY EVER END THE GAME AFTER THE USER HAS GUESSED THE CORRECT CHAMPION, NEVER END THE GAME FOR ANY OTHER REASON.',
+        inputSchema: z.object({}),
+        execute: async () => {
+          endGameWasRequested = true
+          return 'ok'
+        },
+      }),
+    },
+    onFinish: async ({ usage }) => {
       const { inputTokens, outputTokens, totalTokens } = usage
-      const systemTokens = typeof system.tokens === 'number' ? system.tokens : 0
-      const adjustedInputTokens = Math.max((inputTokens ?? 0) - systemTokens, 0)
+      const systemTokens = system.tokens
+      const adjustedInputTokens = (inputTokens ?? 0) - systemTokens
       const adjustedTotalTokens = adjustedInputTokens + (outputTokens ?? 0)
+
       // your own logic, e.g. for saving the chat history or recording usage
       console.log('Input tokens:', inputTokens)
       console.log('Output tokens:', outputTokens)
@@ -121,6 +124,17 @@ export async function POST(req: Request) {
       console.log('System prompt tokens:', systemTokens)
       console.log('Adjusted input tokens (minus system):', adjustedInputTokens)
       console.log('Adjusted total tokens (minus system):', adjustedTotalTokens)
+
+      if (endGameWasRequested) {
+        await endGame({
+          tokens: {
+            input_tokens: Math.max(0, adjustedInputTokens),
+            output_tokens: outputTokens ?? 0,
+            total_tokens: Math.max(0, adjustedTotalTokens),
+          },
+          gameId: gameId,
+        })
+      }
     },
     messages: convertToModelMessages(messages),
   })
