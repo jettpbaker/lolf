@@ -1,42 +1,42 @@
-'use client';
+'use client'
 
-import { useChat } from '@ai-sdk/react';
-import { DefaultChatTransport } from 'ai';
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { CheckIcon } from 'raster-react';
-import Link from 'next/link';
+import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
+import { useState } from 'react'
+import { Button } from '@/components/ui/button'
+import { CheckIcon } from 'raster-react'
+import Link from 'next/link'
 
 export default function Chat({
   championId,
   championInfo,
 }: {
-  championId: string;
-  championInfo: object;
+  championId: string
+  championInfo: object
 }) {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState('')
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       body: { champion: championId, championInfo },
     }),
     async onToolCall({ toolCall }) {
-      if (toolCall.dynamic) return;
+      if (toolCall.dynamic) return
 
       if (toolCall.toolName === 'endGame') {
-        console.log('endGame tool call');
+        console.log('endGame tool call')
         // TODO: Show Confetti
       }
     },
-  });
+  })
 
   const lastMessageRole = messages.length
     ? messages[messages.length - 1]?.role
-    : undefined;
+    : undefined
 
   const isThinking =
     (status === 'submitted' || status === 'streaming') &&
-    lastMessageRole === 'user';
+    lastMessageRole === 'user'
 
   return (
     <div className='flex flex-col w-full max-w-2xl mx-auto h-[80vh] border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900'>
@@ -57,9 +57,9 @@ export default function Chat({
                     >
                       {part.text}
                     </div>
-                  );
+                  )
                 }
-                return null;
+                return null
               })}
             </div>
           ) : (
@@ -73,18 +73,7 @@ export default function Chat({
                     >
                       {part.text}
                     </div>
-                  );
-                }
-
-                if (part.type === 'reasoning') {
-                  return (
-                    <div
-                      key={`${message.id}-reasoning`}
-                      className='flex justify-start bg-zinc-800 text-red-600 dark:text-red-400 w-fit whitespace-pre-wrap text-sm px-3 py-2 shadow-sm rounded-none'
-                    >
-                      {part.text}
-                    </div>
-                  );
+                  )
                 }
 
                 if (part.type === 'tool-endGame') {
@@ -99,9 +88,9 @@ export default function Chat({
                         leaderboard
                       </Link>
                     </div>
-                  );
+                  )
                 }
-                return null;
+                return null
               })}
             </div>
           ),
@@ -120,10 +109,10 @@ export default function Chat({
 
       <form
         onSubmit={(e) => {
-          e.preventDefault();
-          if (!input.trim()) return;
-          sendMessage({ text: input });
-          setInput('');
+          e.preventDefault()
+          if (!input.trim()) return
+          sendMessage({ text: input })
+          setInput('')
         }}
         className='border-t border-zinc-300 dark:border-zinc-800 p-3 flex items-center gap-2'
       >
@@ -154,5 +143,5 @@ export default function Chat({
         }
       `}</style>
     </div>
-  );
+  )
 }
