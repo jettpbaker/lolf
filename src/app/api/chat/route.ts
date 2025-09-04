@@ -1,5 +1,4 @@
 import { createGame } from '@/server/actions'
-import normalise from '@/utils/normalise'
 import { streamText, convertToModelMessages, tool } from 'ai'
 import type { UIMessage } from 'ai'
 import { z } from 'zod'
@@ -81,16 +80,14 @@ ${JSON.stringify(championInfo)}
   }
 }
 
-const buildTools = (champion: string) => {
+const buildTools = () => {
   return {
     endGame: tool({
       description:
-        'ONLY EVER END THE GAME AFTER THE USER HAS GUESSED THE CORRECT CHAMPION, NEVER END THE GAME FOR ANY OTHER REASON. Include the guess.',
+        'ONLY EVER END THE GAME AFTER THE USER HAS GUESSED THE CORRECT CHAMPION, NEVER END THE GAME FOR ANY OTHER REASON.',
       inputSchema: z.object({ guess: z.string() }),
-      execute: async ({ guess }) => {
-        const g = normalise(guess)
-        const c = normalise(champion)
-        await createGame(g, c)
+      execute: async () => {
+        await createGame()
       },
     }),
   }
@@ -109,7 +106,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: 'openai/gpt-5-mini',
     system: system.prompt,
-    tools: buildTools(champion ?? ''),
+    tools: buildTools(),
     onFinish: ({ usage }) => {
       const { inputTokens, outputTokens, totalTokens } = usage
       const systemTokens = typeof system.tokens === 'number' ? system.tokens : 0
