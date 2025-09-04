@@ -5,8 +5,6 @@ import { redirect } from 'next/navigation'
 import { auth } from '@/utils/auth'
 
 export async function getStarted() {
-  console.log('Hello!')
-
   const session = await auth.api.getSession({
     headers: await headers(),
   })

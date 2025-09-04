@@ -98,7 +98,7 @@ export async function POST(req: Request) {
   let endGameWasRequested = false
 
   const result = streamText({
-    model: 'openai/gpt-5-mini',
+    model: 'openai/gpt-oss-120b',
     system: system.prompt,
     tools: {
       endGame: tool({
