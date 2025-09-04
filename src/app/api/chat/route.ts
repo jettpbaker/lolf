@@ -1,15 +1,29 @@
-import { createGame } from '@/server/actions';
-import normalise from '@/utils/normalise';
-import { streamText, convertToModelMessages, tool } from 'ai';
-import type { UIMessage } from 'ai';
-import { z } from 'zod';
+import { createGame } from '@/server/actions'
+import normalise from '@/utils/normalise'
+import { streamText, convertToModelMessages, tool } from 'ai'
+import type { UIMessage } from 'ai'
+import { z } from 'zod'
+import { encodingForModel } from 'js-tiktoken'
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+export const maxDuration = 30
 
-function buildSystemPrompt(champion: string, championInfo: object) {
-  return {
-    prompt: `
+let encoder: ReturnType<typeof encodingForModel> | undefined
+
+function getEncoder() {
+  if (!encoder) {
+    // DeepSeek and many OpenAI-style chat models are compatible with cl100k_base.
+    encoder = encodingForModel('gpt-5')
+  }
+  return encoder
+}
+
+function encodeTokens(text: string) {
+  const enc = getEncoder()
+  return enc.encode(text ?? '')
+}
+
+async function buildSystemPrompt(champion: string, championInfo: object) {
+  const prompt = `
 Role
 
 You are the Game Master for “lolf,” a Guess-Who–style League of Legends game. Keep the secret champion hidden while answering the player’s questions.
@@ -57,10 +71,14 @@ The secret champion for this session is ${champion}.
 
 Champion Information:
 ${JSON.stringify(championInfo)}
-`,
-    // TODO: Dynamically calculate tokens
-    tokens: 635,
-  };
+`
+
+  const tokenIds = encodeTokens(prompt)
+
+  return {
+    prompt,
+    tokens: tokenIds.length,
+  }
 }
 
 const buildTools = (champion: string) => {
@@ -70,13 +88,13 @@ const buildTools = (champion: string) => {
         'ONLY EVER END THE GAME AFTER THE USER HAS GUESSED THE CORRECT CHAMPION, NEVER END THE GAME FOR ANY OTHER REASON. Include the guess.',
       inputSchema: z.object({ guess: z.string() }),
       execute: async ({ guess }) => {
-        const g = normalise(guess);
-        const c = normalise(champion);
-        await createGame(g, c);
+        const g = normalise(guess)
+        const c = normalise(champion)
+        await createGame(g, c)
       },
     }),
-  };
-};
+  }
+}
 
 export async function POST(req: Request) {
   const {
@@ -84,20 +102,29 @@ export async function POST(req: Request) {
     champion,
     championInfo,
   }: { messages: UIMessage[]; champion?: string; championInfo?: object } =
-    await req.json();
+    await req.json()
 
-  const system = buildSystemPrompt(champion ?? '', championInfo ?? {});
+  const system = await buildSystemPrompt(champion ?? '', championInfo ?? {})
 
   const result = streamText({
-    model: 'deepseek/deepseek-v3.1',
+    model: 'openai/gpt-5-mini',
     system: system.prompt,
     tools: buildTools(champion ?? ''),
     onFinish: ({ usage }) => {
-      console.log('System prompt tokens: ' + system.tokens);
-      console.log(usage);
+      const { inputTokens, outputTokens, totalTokens } = usage
+      const systemTokens = typeof system.tokens === 'number' ? system.tokens : 0
+      const adjustedInputTokens = Math.max((inputTokens ?? 0) - systemTokens, 0)
+      const adjustedTotalTokens = adjustedInputTokens + (outputTokens ?? 0)
+      // your own logic, e.g. for saving the chat history or recording usage
+      console.log('Input tokens:', inputTokens)
+      console.log('Output tokens:', outputTokens)
+      console.log('Total tokens:', totalTokens)
+      console.log('System prompt tokens:', systemTokens)
+      console.log('Adjusted input tokens (minus system):', adjustedInputTokens)
+      console.log('Adjusted total tokens (minus system):', adjustedTotalTokens)
     },
     messages: convertToModelMessages(messages),
-  });
+  })
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse()
 }
