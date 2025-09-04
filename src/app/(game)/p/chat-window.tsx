@@ -86,7 +86,7 @@ export default function Chat({
                     >
                       <CheckIcon /> You've won! Check out your best run on
                       the&nbsp;
-                      <Link href='/leaderboard' className='underline'>
+                      <Link href='/l' className='underline'>
                         leaderboard
                       </Link>
                     </div>

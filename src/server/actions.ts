@@ -57,7 +57,11 @@ export async function endGame({
     .where(and(eq(gameTable.userId, session.user.id), eq(gameTable.id, gameId)))
 }
 
+import { connection } from 'next/server'
+
 export async function getGames() {
+  await connection() // Makes dynamic
+
   const games = await db
     .select({
       id: gameTable.id,
