@@ -1,25 +1,25 @@
-import type { Metadata } from 'next';
-import localFont from 'next/font/local';
-import './globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
-import { ThemeSwitcher } from '@/components/theme-switcher';
+import type { Metadata } from 'next'
+import localFont from 'next/font/local'
+import './globals.css'
+import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
 const pixel = localFont({
   src: '../fonts/pixel-font.woff2',
   variable: '--font-pixel',
   display: 'swap',
   preload: true,
-});
+})
 
 export const metadata: Metadata = {
   title: 'lolf',
   description: 'lolf guessing game',
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <html
@@ -41,5 +41,5 @@ export default function RootLayout({
         </ThemeProvider>
       </body>
     </html>
-  );
+  )
 }

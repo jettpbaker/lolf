@@ -86,7 +86,7 @@ export default function Chat({
                     >
                       <CheckIcon /> You've won! Check out your best run on
                       the&nbsp;
-                      <Link href='/l' className='underline'>
+                      <Link href='/l' prefetch={false} className='underline'>
                         leaderboard
                       </Link>
                     </div>

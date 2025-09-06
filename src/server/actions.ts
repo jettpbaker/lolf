@@ -15,7 +15,7 @@ export async function getStarted() {
 
 import db from '@/db'
 import { game as gameTable } from '@/db/schema/game'
-import { and, eq, asc } from 'drizzle-orm'
+import { and, eq, asc, sql } from 'drizzle-orm'
 import { user as userTable } from '@/db/schema/auth-schema'
 
 export async function createGame(userId: string) {
@@ -39,10 +39,7 @@ export async function endGame({
   const session = await auth.api.getSession({
     headers: await headers(),
   })
-
   if (!session) throw new Error('User not found')
-
-  console.log('trying to end game')
 
   await db
     .update(gameTable)
@@ -60,17 +57,34 @@ import { connection } from 'next/server'
 export async function getGames() {
   await connection() // Makes dynamic
 
-  const games = await db
+  const subquery = db
     .select({
       id: gameTable.id,
+      userId: gameTable.userId,
       userName: userTable.name,
       input_tokens: gameTable.input_tokens,
       output_tokens: gameTable.output_tokens,
       total_tokens: gameTable.total_tokens,
+      rowNum:
+        sql<number>`ROW_NUMBER() OVER (PARTITION BY ${gameTable.userId} ORDER BY ${gameTable.total_tokens} ASC)`.as(
+          'row_num',
+        ),
     })
     .from(gameTable)
     .leftJoin(userTable, eq(gameTable.userId, userTable.id))
     .where(eq(gameTable.completed, true))
-    .orderBy(asc(gameTable.total_tokens))
+    .as('ranked_games')
+
+  const games = await db
+    .select({
+      id: subquery.id,
+      userName: subquery.userName,
+      input_tokens: subquery.input_tokens,
+      output_tokens: subquery.output_tokens,
+      total_tokens: subquery.total_tokens,
+    })
+    .from(subquery)
+    .where(sql`${subquery.rowNum} = 1`)
+    .orderBy(asc(subquery.total_tokens))
   return games
 }
