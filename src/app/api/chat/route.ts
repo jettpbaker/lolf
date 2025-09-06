@@ -2,30 +2,20 @@ import { endGame } from '@/server/actions'
 import { streamText, convertToModelMessages, tool } from 'ai'
 import type { UIMessage } from 'ai'
 import { z } from 'zod'
-import { encodingForModel } from 'js-tiktoken'
 
 export const maxDuration = 30
 
-let encoder: ReturnType<typeof encodingForModel> | undefined
-
-function getEncoder() {
-  if (!encoder) {
-    // DeepSeek and many OpenAI-style chat models are compatible with cl100k_base.
-    encoder = encodingForModel('gpt-5')
-  }
-  return encoder
-}
-
-function encodeTokens(text: string) {
-  const enc = getEncoder()
-  return enc.encode(text ?? '')
+function countTokens(text: string) {
+  // A token is *roughly* 4 characters. This is only a rough estimate, but as everyone gets the same rough estimate, it's fair.
+  const tokens = text.length / 4
+  return tokens
 }
 
 async function buildSystemPrompt(champion: string, championInfo: object) {
   const prompt = `
 Role
 
-You are the Game Master for “lolf,” a Guess-Who–style League of Legends game. Keep the secret champion hidden while answering the player’s questions.
+You are the Game Master for “lolf,” a Guess-Who–style League of Legends game. Keep the secret champion hidden while answering the player’s questions. Be friendly!
 
 Answer Style
 
@@ -72,11 +62,10 @@ Champion Information:
 ${JSON.stringify(championInfo)}
 `
 
-  const tokenIds = encodeTokens(prompt)
-
+  const tokens = countTokens(prompt)
   return {
     prompt,
-    tokens: tokenIds.length,
+    tokens,
   }
 }
 
@@ -96,7 +85,7 @@ export async function POST(req: Request) {
   let endGameWasRequested = false
 
   const result = streamText({
-    model: 'openai/gpt-oss-120b',
+    model: 'anthropic/claude-sonnet-4',
     system: system.prompt,
     tools: {
       endGame: tool({
@@ -113,7 +102,11 @@ export async function POST(req: Request) {
       const { inputTokens, outputTokens, totalTokens } = usage
       const systemTokens = system.tokens
       const adjustedInputTokens = (inputTokens ?? 0) - systemTokens
-      const adjustedTotalTokens = (totalTokens ?? 0) - systemTokens
+      const adjustedTotalTokens = adjustedInputTokens + (outputTokens ?? 0)
+
+      console.log('adjustedTotalTokens', adjustedTotalTokens)
+      console.log('systemTokens', systemTokens)
+      console.log('totalTokens', totalTokens)
 
       if (endGameWasRequested) {
         await endGame({

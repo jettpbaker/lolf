@@ -1,10 +1,10 @@
-import { headers } from 'next/headers';
-import { auth } from '@/utils/auth';
+import { headers } from 'next/headers'
+import { auth } from '@/utils/auth'
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
     headers: await headers(),
-  });
+  })
 
   if (!session) {
     return (
@@ -15,13 +15,13 @@ export default async function ProfilePage() {
           Sign in
         </a>
       </div>
-    );
+    )
   }
 
-  const user = session.user;
+  const user = session.user
   const createdAt = (user as any)?.createdAt
     ? new Date((user as any).createdAt).toLocaleString()
-    : undefined;
+    : undefined
 
   return (
     <div className='space-y-4'>
@@ -45,5 +45,5 @@ export default async function ProfilePage() {
         </div>
       </div>
     </div>
-  );
+  )
 }

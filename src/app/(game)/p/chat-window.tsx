@@ -2,7 +2,7 @@
 
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CheckIcon } from 'raster-react'
 import Link from 'next/link'
@@ -33,6 +33,10 @@ export default function Chat({
   const lastMessageRole = messages.length
     ? messages[messages.length - 1]?.role
     : undefined
+
+  useEffect(() => {
+    console.log('status', status)
+  }, [status])
 
   const isThinking =
     (status === 'submitted' || status === 'streaming') &&
@@ -97,7 +101,8 @@ export default function Chat({
         )}
         {isThinking && (
           <div className='flex justify-start'>
-            <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 shadow-sm rounded-none bg-zinc-800 text-zinc-100 '>
+            {/* <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 shadow-sm rounded-none bg-zinc-800 text-zinc-100'> */}
+            <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800'>
               thinking
               <span className='retro-cursor' aria-hidden>
                 █
