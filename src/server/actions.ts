@@ -37,9 +37,7 @@ export async function endGame({
     total_tokens: tokens.total_tokens,
   }
 
-  const game = await db.insert(gameTable).values(gameRow).returning()
-  console.log('game', game)
-  return game
+  await db.insert(gameTable).values(gameRow).returning()
 }
 
 import { connection } from 'next/server'
@@ -75,5 +73,7 @@ export async function getGames() {
     .from(subquery)
     .where(sql`${subquery.rowNum} = 1`)
     .orderBy(asc(subquery.total_tokens))
+
+  if (games.length === 0) return null
   return games
 }

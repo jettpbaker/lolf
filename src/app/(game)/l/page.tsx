@@ -10,6 +10,7 @@ import { getGames } from '@/server/actions'
 
 export default async function LeaderboardPage() {
   const games = await getGames()
+  if (!games) return <div>No games found</div>
 
   return (
     <section className='space-y-4'>
