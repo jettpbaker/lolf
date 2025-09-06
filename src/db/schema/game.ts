@@ -1,11 +1,4 @@
-import {
-  boolean,
-  integer,
-  pgTable,
-  serial,
-  text,
-  timestamp,
-} from 'drizzle-orm/pg-core'
+import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core'
 import { user } from './auth-schema'
 
 export const game = pgTable('game', {
@@ -16,7 +9,6 @@ export const game = pgTable('game', {
   input_tokens: integer('input_tokens').default(0),
   output_tokens: integer('output_tokens').default(0),
   total_tokens: integer('total_tokens').default(0),
-  completed: boolean('completed').default(false),
   createdAt: timestamp('created_at').notNull(),
   updatedAt: timestamp('updated_at').notNull(),
 })

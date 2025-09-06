@@ -10,17 +10,15 @@ import Link from 'next/link'
 export default function Chat({
   championId,
   championInfo,
-  gameId,
 }: {
   championId: string
   championInfo: object
-  gameId: number
 }) {
   const [input, setInput] = useState('')
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
-      body: { champion: championId, championInfo, gameId },
+      body: { champion: championId, championInfo },
     }),
     async onToolCall({ toolCall }) {
       if (toolCall.dynamic) return

@@ -85,12 +85,10 @@ export async function POST(req: Request) {
     messages,
     champion,
     championInfo,
-    gameId,
   }: {
     messages: UIMessage[]
     champion?: string
     championInfo?: object
-    gameId: number
   } = await req.json()
 
   const system = await buildSystemPrompt(champion ?? '', championInfo ?? {})
@@ -115,15 +113,7 @@ export async function POST(req: Request) {
       const { inputTokens, outputTokens, totalTokens } = usage
       const systemTokens = system.tokens
       const adjustedInputTokens = (inputTokens ?? 0) - systemTokens
-      const adjustedTotalTokens = adjustedInputTokens + (outputTokens ?? 0)
-
-      // your own logic, e.g. for saving the chat history or recording usage
-      console.log('Input tokens:', inputTokens)
-      console.log('Output tokens:', outputTokens)
-      console.log('Total tokens:', totalTokens)
-      console.log('System prompt tokens:', systemTokens)
-      console.log('Adjusted input tokens (minus system):', adjustedInputTokens)
-      console.log('Adjusted total tokens (minus system):', adjustedTotalTokens)
+      const adjustedTotalTokens = (totalTokens ?? 0) - systemTokens
 
       if (endGameWasRequested) {
         await endGame({
@@ -132,7 +122,6 @@ export async function POST(req: Request) {
             output_tokens: outputTokens ?? 0,
             total_tokens: Math.max(0, adjustedTotalTokens),
           },
-          gameId: gameId,
         })
       }
     },
