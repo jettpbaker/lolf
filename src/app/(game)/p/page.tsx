@@ -1,24 +1,11 @@
-import selectRandomChampionId from '@/utils/select-random-champion'
-import ChatWindow from './chat-window'
-import getChampion from '@/utils/get-champion'
-import { auth } from '@/utils/auth'
-import { headers } from 'next/headers'
+import PixelBounceLoader from '@/components/pixel-bounce-loader'
+import Chat from './chat'
+import { Suspense } from 'react'
 
 export default async function Play() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  if (!session) return <div>Please log in to play</div>
-
-  const id = await selectRandomChampionId()
-  if (!id) return <div>No champion found</div>
-
-  const champion = await getChampion(id)
-  if (!champion) return <div>No champion found</div>
-
   return (
-    <div>
-      <ChatWindow championId={id} championInfo={champion} />
-    </div>
+    <Suspense fallback={<PixelBounceLoader />}>
+      <Chat />
+    </Suspense>
   )
 }

@@ -1,0 +1,32 @@
+.root {
+	--unit: 8px;
+	display: inline-flex;
+	align-items: flex-end;
+	gap: calc(var(--unit) / 2);
+	height: calc(var(--unit) * 4);
+}
+
+.root span {
+	width: var(--unit);
+	height: var(--unit);
+	background: var(--foreground);
+	animation: pixel-bounce 750ms steps(4, end) infinite;
+}
+
+.root span:nth-child(2) {
+	animation-delay: 100ms;
+}
+
+.root span:nth-child(3) {
+	animation-delay: 200ms;
+}
+
+@keyframes pixel-bounce {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(calc(-2 * var(--unit)));
+	}
+}
