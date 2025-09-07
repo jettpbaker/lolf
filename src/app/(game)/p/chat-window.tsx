@@ -30,7 +30,7 @@ export default function Chat({
 
       if (toolCall.toolName === 'endGame') {
         console.log('endGame tool call')
-        // TODO: Show Confetti
+        // TODO: Show Confetti or something
       }
     },
   })
