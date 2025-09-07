@@ -2,10 +2,8 @@
 
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
-import { CheckIcon } from 'raster-react'
-import Link from 'next/link'
+import ChatMessageList from './chat-message-list'
+import ChatInput from './chat-input'
 import { useSearchParams } from 'next/navigation'
 
 export default function Chat({
@@ -15,7 +13,6 @@ export default function Chat({
   championId: string
   championInfo: object
 }) {
-  const [input, setInput] = useState('')
   const searchParams = useSearchParams()
   const debug =
     (searchParams?.get('debug') ?? '').toLowerCase() === '1' ||
@@ -41,115 +38,13 @@ export default function Chat({
         Chat Terminal
       </div>
 
-      <div className='flex-1 overflow-y-auto px-4 py-4 space-y-3'>
-        {messages.map((message) =>
-          message.role === 'user' ? (
-            <div key={message.id} className='flex justify-end'>
-              {message.parts.map((part) => {
-                if (part.type === 'text') {
-                  return (
-                    <div
-                      key={`${message.id}-text`}
-                      className='bg-zinc-300 text-zinc-900 w-fit whitespace-pre-wrap text-sm px-3 py-2 shadow-sm rounded-none'
-                    >
-                      {part.text}
-                    </div>
-                  )
-                }
-                return null
-              })}
-            </div>
-          ) : (
-            <div key={message.id}>
-              {message.parts.map((part) => {
-                if (part.type === 'text') {
-                  return (
-                    <div
-                      key={`${message.id}-text`}
-                      className='flex justify-start bg-zinc-800 text-zinc-100 w-fit whitespace-pre-wrap text-sm px-3 py-2 shadow-sm rounded-none'
-                    >
-                      {part.text}
-                    </div>
-                  )
-                }
+      <ChatMessageList messages={messages} debug={debug} />
 
-                if (part.type === 'reasoning' && debug) {
-                  return (
-                    <div
-                      key={`${message.id}-reasoning`}
-                      className='flex justify-start'
-                    >
-                      <div className='w-fit whitespace-pre-wrap text-xs font-mono px-2 py-1 rounded-none text-zinc-600 dark:text-zinc-400 border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900'>
-                        [debug] {part.text}
-                      </div>
-                    </div>
-                  )
-                }
+      <ChatInput
+        onSend={(text: string) => sendMessage({ text })}
+        status={status}
+      />
 
-                if (
-                  part.type === 'reasoning' &&
-                  !debug &&
-                  part.state !== 'done'
-                ) {
-                  return (
-                    <div
-                      className='flex justify-start'
-                      key={`${message.id}-reasoning`}
-                    >
-                      <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800'>
-                        thinking
-                        <span className='retro-cursor' aria-hidden>
-                          █
-                        </span>
-                      </div>
-                    </div>
-                  )
-                }
-
-                if (part.type === 'tool-endGame') {
-                  return (
-                    <div
-                      key={`${message.id}-tool-call`}
-                      className='flex justify-start gap-1 opacity-65 mt-1'
-                    >
-                      <CheckIcon /> You've won! Check out your best run on
-                      the&nbsp;
-                      <Link href='/l' prefetch={false} className='underline'>
-                        leaderboard
-                      </Link>
-                    </div>
-                  )
-                }
-                return null
-              })}
-            </div>
-          ),
-        )}
-      </div>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          if (!input.trim()) return
-          sendMessage({ text: input })
-          setInput('')
-        }}
-        className='border-t border-zinc-300 dark:border-zinc-800 p-3 flex items-center gap-2'
-      >
-        <input
-          className='flex-1 bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 px-3 py-2 border border-zinc-400 dark:border-zinc-700 rounded-none outline-none focus:ring-0 focus:border-zinc-600 font-mono text-sm'
-          value={input}
-          placeholder='Type your message...'
-          onChange={(e) => setInput(e.currentTarget.value)}
-        />
-        <Button
-          type='submit'
-          className='rounded-none text-xs uppercase tracking-widest'
-          disabled={!input.trim() || status !== 'ready'}
-        >
-          Send
-        </Button>
-      </form>
       <style jsx>{`
         @keyframes retroBlink {
           0%, 49% { opacity: 1; }
