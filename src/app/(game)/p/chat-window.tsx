@@ -21,6 +21,7 @@ export default function Chat({
     (searchParams?.get('debug') ?? '').toLowerCase() === 'true'
 
   const [showConfetti, setShowConfetti] = useState(false)
+  const [gameWon, setGameWon] = useState(false)
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
@@ -30,6 +31,7 @@ export default function Chat({
       if (toolCall.dynamic) return
 
       if (toolCall.toolName === 'endGame') {
+        setGameWon(true)
         setShowConfetti(true)
         setTimeout(() => setShowConfetti(false), 4000)
       }
@@ -49,6 +51,7 @@ export default function Chat({
       <ChatInput
         onSend={(text: string) => sendMessage({ text })}
         status={status}
+        gameWon={gameWon}
       />
 
       {showConfetti && (

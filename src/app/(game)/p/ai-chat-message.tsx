@@ -41,6 +41,7 @@ export default function AIChatMessage({
               <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800'>
                 thinking
                 <span className='retro-cursor' aria-hidden>
+                  {' '}
                   █
                 </span>
               </div>

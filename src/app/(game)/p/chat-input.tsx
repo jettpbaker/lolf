@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button'
 export default function ChatInput({
   onSend,
   status,
+  gameWon,
 }: {
   onSend: (text: string) => void
   status: string
+  gameWon: boolean
 }) {
   const [input, setInput] = useState('')
 
@@ -31,7 +33,7 @@ export default function ChatInput({
       <Button
         type='submit'
         className='rounded-none text-xs uppercase tracking-widest'
-        disabled={!input.trim() || status !== 'ready'}
+        disabled={!input.trim() || status !== 'ready' || gameWon}
       >
         Send
       </Button>

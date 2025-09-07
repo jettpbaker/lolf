@@ -128,3 +128,21 @@
 		color: var(--background);
 	}
 }
+
+.retro-cursor {
+	display: inline-block;
+	margin-left: 4px;
+	width: 0.6ch;
+	animation: retroBlink 1s steps(1, end) infinite;
+}
+
+@keyframes retroBlink {
+	0%,
+	49% {
+		opacity: 1;
+	}
+	50%,
+	100% {
+		opacity: 0;
+	}
+}
