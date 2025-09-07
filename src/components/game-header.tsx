@@ -7,11 +7,6 @@ import { ThemeSwitcher } from '@/components/theme-switcher'
 function NavItem({ href, label }: { href: string; label: string }) {
   const pathname = usePathname()
   const isActive = pathname === href
-  console.log(isActive)
-
-  console.log('pathname', pathname)
-  console.log('href', href)
-  // const isActive = false
 
   return (
     <Link

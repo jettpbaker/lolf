@@ -1,21 +1,11 @@
 'use server'
 
 import { headers } from 'next/headers'
-import { redirect } from 'next/navigation'
 import { auth } from '@/utils/auth'
-
-export async function getStarted() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-
-  if (!session) return redirect('/sign-in')
-  return redirect('/p')
-}
 
 import db from '@/db'
 import { game as gameTable } from '@/db/schema/game'
-import { and, eq, asc, sql } from 'drizzle-orm'
+import { eq, asc, sql } from 'drizzle-orm'
 import { user as userTable } from '@/db/schema/auth-schema'
 
 export async function endGame({
