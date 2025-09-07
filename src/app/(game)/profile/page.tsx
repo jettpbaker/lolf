@@ -1,5 +1,6 @@
 import { headers } from 'next/headers'
 import { auth } from '@/utils/auth'
+import SignOutButton from './sign-out-button'
 
 export default async function ProfilePage() {
   const session = await auth.api.getSession({
@@ -19,8 +20,8 @@ export default async function ProfilePage() {
   }
 
   const user = session.user
-  const createdAt = (user as any)?.createdAt
-    ? new Date((user as any).createdAt).toLocaleString()
+  const createdAt = user?.createdAt
+    ? new Date(user.createdAt).toLocaleString()
     : undefined
 
   return (
@@ -43,6 +44,9 @@ export default async function ProfilePage() {
             </div>
           )}
         </div>
+      </div>
+      <div className='flex gap-2'>
+        <SignOutButton />
       </div>
     </div>
   )
