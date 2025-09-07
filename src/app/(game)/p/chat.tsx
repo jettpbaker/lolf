@@ -17,7 +17,7 @@ export default async function Chat() {
   if (!champion) return <div>No champion found</div>
 
   return (
-    <div>
+    <div className='h-full'>
       <ChatWindow championId={id} championInfo={champion} />
     </div>
   )

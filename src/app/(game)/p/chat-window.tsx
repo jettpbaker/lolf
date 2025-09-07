@@ -36,7 +36,7 @@ export default function Chat({
   })
 
   return (
-    <div className='flex flex-col w-full max-w-2xl mx-auto h-[80vh] border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900'>
+    <div className='flex flex-col w-full h-full border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900'>
       <div className='px-4 py-3 border-b border-zinc-300 dark:border-zinc-800 font-mono text-xs uppercase tracking-widest text-zinc-700 dark:text-zinc-400'>
         Chat Terminal
       </div>

@@ -1,43 +1,46 @@
-import Link from 'next/link';
-// import { usePathname } from 'next/navigation';
-import { ThemeSwitcher } from '@/components/theme-switcher';
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { ThemeSwitcher } from '@/components/theme-switcher'
 
 function NavItem({ href, label }: { href: string; label: string }) {
-  //   const pathname = usePathname();
-  //   const isActive = pathname === href;
-  const isActive = false;
+  const pathname = usePathname()
+  const isActive = pathname === href
+  console.log(isActive)
+
+  console.log('pathname', pathname)
+  console.log('href', href)
+  // const isActive = false
 
   return (
     <Link
       href={href}
       aria-current={isActive ? 'page' : undefined}
       className={
-        `px-4 h-10 grid place-items-center text-sm md:text-base transition-colors rainbow-border-hover rounded-sm border bg-card text-card-foreground overflow-hidden` +
-        (isActive ? 'bg-accent text-accent-foreground' : 'hover:bg-muted')
+        `px-4 h-10 grid place-items-center text-sm md:text-base transition-colors rounded-sm bg-card hover:bg-muted text-card-foreground overflow-hidden ` +
+        (isActive ? 'bg-primary-foreground' : '')
       }
     >
       {label}
     </Link>
-  );
+  )
 }
 
 export default function GameHeader() {
   return (
-    <header className='w-fit mx-auto mt-4'>
+    <header className='w-fit'>
       <nav
-        className='rounded-sm border bg-card text-card-foreground shadow-sm '
+        className='border-y-2 border-zinc-500 dark:border-zinc-700'
         aria-label='Main'
       >
-        <div className='flex items-stretch divide-x'>
-          {/* Theme toggle as the leftmost square segment (replaces colorful block) */}
-          <ThemeSwitcher className='hover:bg-muted' />
-
-          {/* Nav items */}
+        <div className='flex items-stretch divide-x divide-zinc-300 dark:divide-zinc-800'>
+          <ThemeSwitcher className='bg-card hover:bg-muted' />
           <NavItem href='/p' label='Play' />
           <NavItem href='/l' label='Leaderboard' />
           <NavItem href='/profile' label='Profile' />
         </div>
       </nav>
     </header>
-  );
+  )
 }

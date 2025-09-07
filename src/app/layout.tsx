@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import './globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ThemeSwitcher } from '@/components/theme-switcher'
 
 const pixel = localFont({
   src: '../fonts/pixel-font.woff2',
@@ -27,16 +26,15 @@ export default function RootLayout({
       suppressHydrationWarning
       className='max-h-screen max-w-screen'
     >
-      <body className={`${pixel.className} antialiased`}>
+      <body
+        className={`${pixel.className} antialiased max-w-2/3 h-screen mx-auto`}
+      >
         <ThemeProvider
           attribute='class'
           defaultTheme='system'
           enableSystem
           disableTransitionOnChange
         >
-          {/* <div>
-            <ThemeSwitcher />
-          </div> */}
           {children}
         </ThemeProvider>
       </body>

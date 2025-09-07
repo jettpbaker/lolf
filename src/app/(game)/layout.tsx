@@ -1,14 +1,14 @@
-import GameHeader from '@/components/game-header';
+import GameHeader from '@/components/game-header'
 
 export default function GameLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
-    <div className='px-4'>
+    <div className='h-full flex flex-col'>
       <GameHeader />
-      <main className='mx-auto max-w-screen-lg mt-6'>{children}</main>
+      <main className='flex-grow my-10'>{children}</main>
     </div>
-  );
+  )
 }
