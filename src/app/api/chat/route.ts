@@ -2,13 +2,15 @@ import { endGame } from '@/server/actions'
 import { streamText, convertToModelMessages, tool } from 'ai'
 import type { UIMessage } from 'ai'
 import { z } from 'zod'
+import { Tiktoken } from 'js-tiktoken/lite'
+import o200k_base from 'js-tiktoken/ranks/o200k_base'
 
 export const maxDuration = 30
 
+const enc = new Tiktoken(o200k_base)
+
 function countTokens(text: string) {
-  // A token is *roughly* 4 characters. This is only a rough estimate, but as everyone gets the same rough estimate, it's fair.
-  const tokens = text.length / 4
-  return tokens
+  return enc.encode(text).length
 }
 
 async function buildSystemPrompt(champion: string, championInfo: object) {
@@ -49,8 +51,6 @@ TESTING
 - If message contains “test” or “testing,” you may reveal using exactly ${champion}.
 - NEVER CALL ENDGAME IN TESTING unless explicitly instructed.
 
-MOST IMPORTANTLY:
-If the user has made an obviously correct guess that is not EXACTLY the champion name, you may still call the endGame tool, but pass in the correct name, otherwise the end game tool will fail. DO NOT PASS IN THE GUESS, PASS IN THE CORRECT NAME.
 Example:
 If the secret champion is 'Yasuo' and the user guesses 'Yasuoo', you may still call the endGame tool, but pass in 'Yasuo', otherwise the end game tool will fail.
 
@@ -85,7 +85,12 @@ export async function POST(req: Request) {
   let endGameWasRequested = false
 
   const result = streamText({
-    model: 'anthropic/claude-sonnet-4',
+    model: 'openai/gpt-5-mini',
+    providerOptions: {
+      openai: {
+        reasoningEffort: 'low',
+      },
+    },
     system: system.prompt,
     tools: {
       endGame: tool({
@@ -99,14 +104,12 @@ export async function POST(req: Request) {
       }),
     },
     onFinish: async ({ usage }) => {
-      const { inputTokens, outputTokens, totalTokens } = usage
+      const { inputTokens, outputTokens } = usage
       const systemTokens = system.tokens
       const adjustedInputTokens = (inputTokens ?? 0) - systemTokens
       const adjustedTotalTokens = adjustedInputTokens + (outputTokens ?? 0)
 
       console.log('adjustedTotalTokens', adjustedTotalTokens)
-      console.log('systemTokens', systemTokens)
-      console.log('totalTokens', totalTokens)
 
       if (endGameWasRequested) {
         await endGame({

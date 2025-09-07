@@ -2,10 +2,11 @@
 
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { CheckIcon } from 'raster-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 
 export default function Chat({
   championId,
@@ -15,10 +16,14 @@ export default function Chat({
   championInfo: object
 }) {
   const [input, setInput] = useState('')
+  const searchParams = useSearchParams()
+  const debug =
+    (searchParams?.get('debug') ?? '').toLowerCase() === '1' ||
+    (searchParams?.get('debug') ?? '').toLowerCase() === 'true'
 
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
-      body: { champion: championId, championInfo },
+      body: { champion: championId, championInfo, debug },
     }),
     async onToolCall({ toolCall }) {
       if (toolCall.dynamic) return
@@ -29,18 +34,6 @@ export default function Chat({
       }
     },
   })
-
-  const lastMessageRole = messages.length
-    ? messages[messages.length - 1]?.role
-    : undefined
-
-  useEffect(() => {
-    console.log('status', status)
-  }, [status])
-
-  const isThinking =
-    (status === 'submitted' || status === 'streaming') &&
-    lastMessageRole === 'user'
 
   return (
     <div className='flex flex-col w-full max-w-2xl mx-auto h-[80vh] border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900'>
@@ -80,6 +73,39 @@ export default function Chat({
                   )
                 }
 
+                if (part.type === 'reasoning' && debug) {
+                  return (
+                    <div
+                      key={`${message.id}-reasoning`}
+                      className='flex justify-start'
+                    >
+                      <div className='w-fit whitespace-pre-wrap text-xs font-mono px-2 py-1 rounded-none text-zinc-600 dark:text-zinc-400 border border-dashed border-zinc-300 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900'>
+                        [debug] {part.text}
+                      </div>
+                    </div>
+                  )
+                }
+
+                if (
+                  part.type === 'reasoning' &&
+                  !debug &&
+                  part.state !== 'done'
+                ) {
+                  return (
+                    <div
+                      className='flex justify-start'
+                      key={`${message.id}-reasoning`}
+                    >
+                      <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800'>
+                        thinking
+                        <span className='retro-cursor' aria-hidden>
+                          █
+                        </span>
+                      </div>
+                    </div>
+                  )
+                }
+
                 if (part.type === 'tool-endGame') {
                   return (
                     <div
@@ -98,17 +124,6 @@ export default function Chat({
               })}
             </div>
           ),
-        )}
-        {isThinking && (
-          <div className='flex justify-start'>
-            {/* <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 shadow-sm rounded-none bg-zinc-800 text-zinc-100'> */}
-            <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800'>
-              thinking
-              <span className='retro-cursor' aria-hidden>
-                █
-              </span>
-            </div>
-          </div>
         )}
       </div>
 
