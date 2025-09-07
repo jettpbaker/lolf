@@ -1,10 +1,12 @@
 'use client'
 
+import { useState } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import ChatMessageList from './chat-message-list'
 import ChatInput from './chat-input'
 import { useSearchParams } from 'next/navigation'
+import ConfettiExplosion from 'react-confetti-explosion'
 
 export default function Chat({
   championId,
@@ -18,6 +20,8 @@ export default function Chat({
     (searchParams?.get('debug') ?? '').toLowerCase() === '1' ||
     (searchParams?.get('debug') ?? '').toLowerCase() === 'true'
 
+  const [showConfetti, setShowConfetti] = useState(false)
+
   const { messages, sendMessage, status } = useChat({
     transport: new DefaultChatTransport({
       body: { champion: championId, championInfo, debug },
@@ -26,11 +30,13 @@ export default function Chat({
       if (toolCall.dynamic) return
 
       if (toolCall.toolName === 'endGame') {
-        console.log('endGame tool call')
-        // TODO: Show Confetti or something
+        setShowConfetti(true)
+        setTimeout(() => setShowConfetti(false), 4000)
       }
     },
   })
+
+  const vh = typeof window !== 'undefined' ? window.innerHeight : 0
 
   return (
     <div className='flex flex-col w-full h-full border border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900'>
@@ -44,6 +50,19 @@ export default function Chat({
         onSend={(text: string) => sendMessage({ text })}
         status={status}
       />
+
+      {showConfetti && (
+        <div className='pointer-events-none fixed inset-x-0 bottom-0 flex items-end justify-center z-50'>
+          <ConfettiExplosion
+            force={1.75}
+            particleCount={750}
+            duration={3000}
+            particleSize={8}
+            width={1500}
+            height={vh}
+          />
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes retroBlink {
