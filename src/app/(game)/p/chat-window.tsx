@@ -145,7 +145,7 @@ export default function Chat({
         <Button
           type='submit'
           className='rounded-none text-xs uppercase tracking-widest'
-          disabled={!input.trim()}
+          disabled={!input.trim() || status !== 'ready'}
         >
           Send
         </Button>
