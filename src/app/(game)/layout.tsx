@@ -8,7 +8,7 @@ export default function GameLayout({
   return (
     <div className='h-full flex flex-col'>
       <GameHeader />
-      <main className='flex-grow my-10'>{children}</main>
+      <main className='flex-grow my-6 sm:my-8 md:my-10'>{children}</main>
     </div>
   )
 }
