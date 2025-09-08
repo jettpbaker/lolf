@@ -17,7 +17,9 @@ export default async function MyGamesTable() {
       <TableHeader>
         <TableRow>
           <TableHead className='w-16'>#</TableHead>
-          <TableHead>Date</TableHead>
+          <TableHead>
+            Date {' ('}timezones are hard{')'}
+          </TableHead>
           <TableHead className='text-right'>Input Tokens</TableHead>
           <TableHead className='text-right'>Output Tokens</TableHead>
           <TableHead className='text-right'>Total tokens</TableHead>
@@ -27,7 +29,7 @@ export default async function MyGamesTable() {
         {games.map((g, idx) => {
           const index = idx + 1
           const dateLabel = g.createdAt
-            ? new Date(g.createdAt as unknown as string).toLocaleString()
+            ? new Date(g.createdAt as unknown as string).toLocaleDateString()
             : ''
           return (
             <TableRow key={g.id}>
