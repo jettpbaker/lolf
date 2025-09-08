@@ -74,21 +74,25 @@ export async function POST(req: Request) {
     messages,
     champion,
     championInfo,
+    reasoning = false,
   }: {
     messages: UIMessage[]
     champion?: string
     championInfo?: object
+    reasoning?: boolean
   } = await req.json()
 
   const system = await buildSystemPrompt(champion ?? '', championInfo ?? {})
 
   let endGameWasRequested = false
 
+  const model = reasoning ? 'openai/gpt-5-mini' : 'openai/gpt-4o'
+
   const result = streamText({
-    model: 'openai/gpt-5-mini',
+    model,
     providerOptions: {
       openai: {
-        reasoningEffort: 'low',
+        reasoningEffort: reasoning ? 'low' : 'none',
       },
     },
     system: system.prompt,
