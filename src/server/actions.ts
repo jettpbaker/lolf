@@ -67,3 +67,30 @@ export async function getGames() {
   if (games.length === 0) return null
   return games
 }
+
+export async function getMyGames() {
+  await connection() // Makes dynamic
+
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+  if (!session) return null
+
+  const games = await db
+    .select({
+      id: gameTable.id,
+      userId: gameTable.userId,
+      userName: userTable.name,
+      input_tokens: gameTable.input_tokens,
+      output_tokens: gameTable.output_tokens,
+      total_tokens: gameTable.total_tokens,
+      createdAt: gameTable.createdAt,
+    })
+    .from(gameTable)
+    .leftJoin(userTable, eq(gameTable.userId, userTable.id))
+    .where(eq(gameTable.userId, session.user.id))
+    .orderBy(asc(gameTable.total_tokens))
+
+  if (games.length === 0) return null
+  return games
+}

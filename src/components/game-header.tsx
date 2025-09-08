@@ -32,6 +32,7 @@ export default function GameHeader() {
         <div className='flex items-stretch divide-x divide-zinc-300 dark:divide-zinc-800'>
           <ThemeSwitcher className='bg-card hover:bg-muted' />
           <NavItem href='/p' label='Play' />
+          <NavItem href='/g' label='My Games' />
           <NavItem href='/l' label='Leaderboard' />
           <NavItem href='/profile' label='Profile' />
         </div>
