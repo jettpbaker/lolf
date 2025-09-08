@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+export const dynamic = 'force-dynamic'
 import LeaderboardTable from './leaderboard-table'
 import PixelBounceLoader from '@/components/pixel-bounce-loader'
 
