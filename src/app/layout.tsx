@@ -27,7 +27,7 @@ export default function RootLayout({
       className='max-h-screen max-w-screen'
     >
       <body
-        className={`${pixel.className} antialiased h-screen mx-auto max-w-11/12 sm:max-w-10/12 md:max-w-8/12 lg:max-w-6/12`}
+        className={`${pixel.className} antialiased h-screen mx-auto max-w-11/12 sm:max-w-10/12 md:max-w-9/12 lg:max-w-8/12`}
       >
         <ThemeProvider
           attribute='class'

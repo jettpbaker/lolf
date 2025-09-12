@@ -4,6 +4,7 @@ import type { UIMessage } from 'ai'
 import { z } from 'zod'
 import { Tiktoken } from 'js-tiktoken/lite'
 import o200k_base from 'js-tiktoken/ranks/o200k_base'
+import type { OpenAIResponsesProviderOptions } from '@ai-sdk/openai'
 
 export const maxDuration = 30
 
@@ -69,31 +70,34 @@ ${JSON.stringify(championInfo)}
   }
 }
 
+type BodyData = {
+  messages: UIMessage[]
+  champion?: string
+  championInfo?: object
+  reasoningEffort?: 'minimal' | 'high'
+}
+
 export async function POST(req: Request) {
-  const {
-    messages,
-    champion,
-    championInfo,
-    reasoning = false,
-  }: {
-    messages: UIMessage[]
-    champion?: string
-    championInfo?: object
-    reasoning?: boolean
-  } = await req.json()
+  const { messages, champion, championInfo, reasoningEffort }: BodyData =
+    await req.json()
 
   const system = await buildSystemPrompt(champion ?? '', championInfo ?? {})
 
   let endGameWasRequested = false
 
-  const model = reasoning ? 'openai/gpt-5-mini' : 'openai/gpt-4o'
+  const model = reasoningEffort === 'high' ? 'gpt-5' : 'gpt-5-mini'
+
+  console.log('reasoning', reasoningEffort)
 
   const result = streamText({
     model,
     providerOptions: {
       openai: {
-        reasoningEffort: reasoning ? 'low' : 'none',
-      },
+        include: ['reasoning.encrypted_content'],
+        reasoningEffort: reasoningEffort === 'high' ? 'low' : 'minimal',
+        reasoningSummary: 'auto',
+        serviceTier: 'priority',
+      } satisfies OpenAIResponsesProviderOptions,
     },
     system: system.prompt,
     tools: {

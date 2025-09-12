@@ -17,7 +17,7 @@ export default async function Chat() {
   if (!champion) return <div>No champion found</div>
 
   return (
-    <div className='h-full'>
+    <div className='flex-grow max-h-[100%]'>
       <ChatWindow championId={id} championInfo={champion} />
     </div>
   )

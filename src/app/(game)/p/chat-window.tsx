@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useChat } from '@ai-sdk/react'
 import { DefaultChatTransport } from 'ai'
 import ChatMessageList from './chat-message-list'
@@ -23,12 +23,14 @@ export default function Chat({
 
   const [showConfetti, setShowConfetti] = useState(false)
   const [gameWon, setGameWon] = useState(false)
-  const [reasoning, setReasoning] = useState(false)
+  const [reasoningEffort, setReasoningEffort] = useState<'minimal' | 'high'>(
+    'minimal',
+  )
+  useEffect(() => {
+    console.log('reasoning', reasoningEffort)
+  }, [reasoningEffort])
 
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({
-      body: { champion: championId, championInfo, debug, reasoning },
-    }),
     async onToolCall({ toolCall }) {
       if (toolCall.dynamic) return
 
@@ -49,12 +51,14 @@ export default function Chat({
         <div className='flex items-center gap-2'>
           <span className='text-xs'>Reasoning</span>
           <Toggle
-            pressed={reasoning}
-            onPressedChange={setReasoning}
+            pressed={reasoningEffort === 'high'}
+            onPressedChange={(pressed) =>
+              setReasoningEffort(pressed ? 'high' : 'minimal')
+            }
             variant='outline'
             size='sm'
           >
-            {reasoning ? 'ON' : 'OFF'}
+            {reasoningEffort === 'high' ? 'High' : 'Minimal'}
           </Toggle>
         </div>
       </div>
@@ -62,7 +66,19 @@ export default function Chat({
       <ChatMessageList messages={messages} debug={debug} />
 
       <ChatInput
-        onSend={(text: string) => sendMessage({ text })}
+        onSend={(text: string) =>
+          sendMessage(
+            { text },
+            {
+              body: {
+                champion: championId,
+                championInfo,
+                debug,
+                reasoningEffort,
+              },
+            },
+          )
+        }
         status={status}
         gameWon={gameWon}
       />

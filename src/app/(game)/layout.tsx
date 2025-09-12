@@ -6,9 +6,11 @@ export default function GameLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className='h-full flex flex-col'>
+    <div className='h-full max-h-full flex flex-col'>
       <GameHeader />
-      <main className='flex-grow my-6 sm:my-8 md:my-10'>{children}</main>
+      <div className='flex-grow flex min-h-0'>
+        <main className='flex-grow flex my-10'>{children}</main>
+      </div>
     </div>
   )
 }
