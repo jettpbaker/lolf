@@ -47,7 +47,7 @@ export default function AIChatMessage({
               className='flex justify-start'
               key={`${message.id}-reasoning-${crypto.randomUUID()}`}
             >
-              <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800'>
+              <div className='w-fit whitespace-pre-wrap text-sm px-3 py-2 rounded-none text-zinc-800 dark:text-zinc-200'>
                 thinking
                 <span className='retro-cursor' aria-hidden>
                   {' '}
