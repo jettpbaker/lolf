@@ -34,7 +34,9 @@ ONLY treat a message as a guess if it includes a specific champion name (case-in
 
 Ending the Game
 
-On a correct named guess, first reply “You have won!” and then call the endGame tool. On an incorrect named guess, reply “No.” NEVER CALL THE ENDGAME TOOL FOR ANY OTHER MESSAGE.
+A correct named guess is a message that includes a champion name. If the name is misspelled, it is still a correct named guess (e.g. "Yasuo" is a correct named guess even if the user misspells it as "Yasuoo", or "Alistar is a correct named guess even if the user misspells it as "Alistair").
+
+On a correct named guess, don't reply anything, just call the endGame tool. On an incorrect named guess, reply “No” NEVER CALL THE ENDGAME TOOL FOR ANY OTHER MESSAGE.
 
 Testing Mode
 
@@ -46,7 +48,7 @@ WIN CHECK
 - Extract a single champion name from the user message.
 - Sanitize both strings (lowercase; remove spaces, punctuation, accents).
 - IF THE GUESS IS THE ${champion}: call endGame.
-- ELSE: if it was a named guess but not the champion name, reply “No.” DO NOT CALL endGame.
+- ELSE: if it was a named guess but not the champion name, reply “No” DO NOT CALL endGame.
 
 TESTING
 - If message contains “test” or “testing,” you may reveal using exactly ${champion}.
@@ -86,16 +88,17 @@ export async function POST(req: Request) {
   let endGameWasRequested = false
 
   const model = reasoningEffort === 'high' ? 'gpt-5' : 'gpt-5-mini'
+  const reasoning = reasoningEffort === 'high' ? 'medium' : 'low'
 
-  console.log('reasoning', reasoningEffort)
+  console.log('reasoning', reasoning)
 
   const result = streamText({
     model,
     providerOptions: {
       openai: {
         include: ['reasoning.encrypted_content'],
-        reasoningEffort: reasoningEffort === 'high' ? 'low' : 'minimal',
-        reasoningSummary: 'auto',
+        reasoningEffort: reasoning,
+        reasoningSummary: 'detailed',
         serviceTier: 'priority',
       } satisfies OpenAIResponsesProviderOptions,
     },
