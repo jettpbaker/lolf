@@ -4,10 +4,12 @@ import { Button } from '@/components/ui/button';
 import { authClient } from '@/utils/auth-client';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import PixelBounceLoader from '@/components/pixel-bounce-loader';
 
 export default function SignOut() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSignOut = async () => {
     try {
@@ -16,7 +18,9 @@ export default function SignOut() {
       router.push('/');
     } catch (error) {
       console.error('Sign out error:', error);
-      router.push('/');
+      const message =
+        error instanceof Error ? error.message : 'Something went wrong. Please try again.';
+      setErrorMessage(message);
     } finally {
       setIsLoading(false);
     }
@@ -30,8 +34,15 @@ export default function SignOut() {
           Click the button below to sign out.
         </p>
         <Button onClick={handleSignOut} disabled={isLoading}>
-          {isLoading ? 'Signing out…' : 'Sign out'}
+          {isLoading ? (
+            <PixelBounceLoader className='dark:text-black text-white translate-y-[-4px]' />
+          ) : (
+            'Sign out'
+          )}
         </Button>
+        {errorMessage && (
+          <p className='text-red-500 mt-4'>{errorMessage}</p>
+        )}
       </div>
     </div>
   );

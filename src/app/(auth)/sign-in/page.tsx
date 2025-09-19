@@ -7,22 +7,42 @@ import { authClient } from '@/utils/auth-client'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
+import PixelBounceLoader from '@/components/pixel-bounce-loader'
 
 export default function SignIn() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    setErrorMessage(null)
+    try {
+      setIsLoading(true)
+      const result = await authClient.signIn.email({
+        email: email,
+        password: password,
+      })
 
-    const data = await authClient.signIn.email({
-      email: email,
-      password: password,
-    })
+      if (result?.data?.user) {
+        router.push('/p/')
+        return
+      }
 
-    if (data?.data?.user) {
-      router.push('/p/')
+      const fallbackMessage = 'Invalid email or password'
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const possibleError: any = result as any
+      setErrorMessage(
+        (possibleError?.error?.message as string) || fallbackMessage,
+      )
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong. Please try again.'
+      setErrorMessage(message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -46,6 +66,7 @@ export default function SignIn() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete='email'
+              disabled={isLoading}
             />
           </div>
           <div className='space-y-2'>
@@ -58,12 +79,20 @@ export default function SignIn() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete='current-password'
+              disabled={isLoading}
             />
           </div>
-          <Button type='submit' className='w-full'>
-            Sign in
+          <Button type='submit' className='w-full' disabled={isLoading}>
+            {isLoading ? (
+              <PixelBounceLoader className='dark:text-black text-white translate-y-[-4px]' />
+            ) : (
+              'Sign in'
+            )}
           </Button>
         </form>
+        {errorMessage && (
+          <p className='text-red-500'>{errorMessage}</p>
+        )}
         <p className='text-sm text-muted-foreground'>
           Dont have an account?{' '}
           <Link className='underline underline-offset-4' href='/sign-up'>
